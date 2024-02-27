@@ -1,12 +1,15 @@
-import { response } from "express";
 import User from "../models/User.js";
 
 class UserController {
 
     async store(req, res) {
-        const data = req.body;
-        await User.create(data);
-        return res.status(200).json({ message: "User successfully created" });
+        let image ='';
+        if(req.file){
+            image=req.file.filename;
+        }
+        const user = new User({...req.body, image});
+        await user.save();
+        return res.status(200).json(user);
     }
     async index(request, response) {
         const users = await User.find({});
@@ -14,7 +17,7 @@ class UserController {
     }
     async show(req, res) {
         let id= req.params.id;
-        let user= await User.findOne({_id : id});
+        let user= await User.findById(id);
         return res.json({user});
     }
     async destroy(req, res){
